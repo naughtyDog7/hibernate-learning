@@ -1,8 +1,12 @@
 package uz.dev.caveatemptor.entity;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.*;
+import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
+import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmountUserType;
 
+import javax.persistence.AccessType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.*;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -14,6 +18,16 @@ import java.util.Set;
 
 @Entity
 @Table(name = "item")
+@TypeDefs({
+        @TypeDef(
+                name = "monetary_amount_usd",
+                typeClass = MonetaryAmountUserType.class,
+                parameters = @org.hibernate.annotations.Parameter(name = "convertTo", value = "USD")),
+        @TypeDef(
+                name = "monetary_amount_eur",
+                typeClass = MonetaryAmountUserType.class,
+                parameters = @org.hibernate.annotations.Parameter(name = "convertTo", value = "EUR")),
+})
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,7 +49,20 @@ public class Item {
     @Future
     private LocalDateTime auctionEnd;
     private boolean verified;
+    @Type(type = "monetary_amount_usd")
+    @Columns(columns = {
+            @Column(name = "INITIAL_PRICE_AMOUNT"),
+            @Column(name = "INITIAL_PRICE_CURRENCY", length = 3)
+    })
     private MonetaryAmount initialPrice;
+
+
+    @Type(type = "monetary_amount_eur")
+    @Columns(columns = {
+            @Column(name = "BUY_NOW_PRICE_AMOUNT"),
+            @Column(name = "BUY_NOW_PRICE_CURRENCY", length = 3)
+    })
+    private MonetaryAmount buyNowPrice;
 
     @NotNull
     @Column(nullable = false)
@@ -74,6 +101,10 @@ public class Item {
 
     public Set<Bid> getBids() {
         return Collections.unmodifiableSet(bids);
+    }
+
+    public void setBuyNowPrice(MonetaryAmount buyNowPrice) {
+        this.buyNowPrice = buyNowPrice;
     }
 
     @Override

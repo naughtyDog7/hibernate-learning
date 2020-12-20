@@ -1,6 +1,7 @@
 package uz.dev.caveatemptor.entity;
 
 import org.hibernate.annotations.Immutable;
+import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

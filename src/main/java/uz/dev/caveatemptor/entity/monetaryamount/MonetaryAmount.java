@@ -1,4 +1,4 @@
-package uz.dev.caveatemptor.entity;
+package uz.dev.caveatemptor.entity.monetaryamount;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;

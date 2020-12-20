@@ -24,7 +24,6 @@ public class SessionFactoryConfigurer {
                             .addAnnotatedClass(Bid.class)
                             .addAnnotatedClass(User.class)
                             .addAnnotatedClass(ItemBidSummary.class)
-                            .addAnnotatedClass(MonetaryAmountConverter.class)
                             .addAnnotatedClass(ZipcodeConverter.class);
                     Metadata metadata = metadataSources.buildMetadata();
                     sessionFactory = metadata.buildSessionFactory();

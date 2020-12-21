@@ -1,6 +1,7 @@
 package uz.dev.caveatemptor.entity;
 
 import uz.dev.caveatemptor.entity.zipcode.ZipcodeConverter;
+import uz.dev.caveatemptor.util.Constants;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -9,17 +10,16 @@ import javax.validation.constraints.NotNull;
 @Table(name = "user")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = Constants.ID_GENERATOR)
     private long id;
 
     @NotNull
-    @Column(nullable = false)
     private String username;
+
     @NotNull
-    @Column(nullable = false)
     private String firstName;
+
     @NotNull
-    @Column(nullable = false)
     private String lastName;
 
     @NotNull

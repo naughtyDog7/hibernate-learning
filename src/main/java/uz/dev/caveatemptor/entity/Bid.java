@@ -2,6 +2,7 @@ package uz.dev.caveatemptor.entity;
 
 import org.hibernate.annotations.Immutable;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
+import uz.dev.caveatemptor.util.Constants;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 public class Bid {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = Constants.ID_GENERATOR)
     private long id;
     private MonetaryAmount amount;
     private LocalDateTime createdOn;

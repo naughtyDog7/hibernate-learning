@@ -9,11 +9,9 @@ import java.util.Objects;
 
 public class MonetaryAmount implements Serializable {
     @NotNull
-    @Column(nullable = false)
     private final BigDecimal value;
 
     @NotNull
-    @Column(nullable = false)
     private final Currency currency;
 
     public MonetaryAmount(BigDecimal value, Currency currency) {

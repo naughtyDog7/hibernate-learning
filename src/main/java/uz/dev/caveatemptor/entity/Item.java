@@ -3,6 +3,7 @@ package uz.dev.caveatemptor.entity;
 import org.hibernate.annotations.*;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmountUserType;
+import uz.dev.caveatemptor.util.Constants;
 
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
@@ -30,7 +31,7 @@ import java.util.Set;
 })
 public class Item {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = Constants.ID_GENERATOR)
     private long id;
 
     @Size(

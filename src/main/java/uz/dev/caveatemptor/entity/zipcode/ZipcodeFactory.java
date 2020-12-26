@@ -1,6 +1,6 @@
 package uz.dev.caveatemptor.entity.zipcode;
 
-class ZipcodeFactory {
+public class ZipcodeFactory {
     public static Zipcode fromString(String zipcodeStr) {
         if (zipcodeStr.length() == 5)
             return new GermanZipcode(zipcodeStr);

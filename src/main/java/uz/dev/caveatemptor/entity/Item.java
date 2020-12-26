@@ -1,13 +1,12 @@
 package uz.dev.caveatemptor.entity;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.Type;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
-import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmountUserType;
 import uz.dev.caveatemptor.util.Constants;
 
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.*;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -19,16 +18,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "item")
-@TypeDefs({
-        @TypeDef(
-                name = "monetary_amount_usd",
-                typeClass = MonetaryAmountUserType.class,
-                parameters = @org.hibernate.annotations.Parameter(name = "convertTo", value = "USD")),
-        @TypeDef(
-                name = "monetary_amount_eur",
-                typeClass = MonetaryAmountUserType.class,
-                parameters = @org.hibernate.annotations.Parameter(name = "convertTo", value = "EUR")),
-})
 public class Item {
     @Id
     @GeneratedValue(generator = Constants.ID_GENERATOR)
@@ -70,9 +59,16 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private AuctionType auctionType;
 
-    @Access(AccessType.FIELD)
-    @OneToMany(mappedBy = "item")
+    @ElementCollection
+    @CollectionTable(name = "BID")
     private Set<Bid> bids = new HashSet<>();
+
+    private Dimensions dimensions;
+    private Weight weight;
+
+    @ElementCollection
+    @CollectionTable(name = "IMAGE")
+    private Set<Image> images = new HashSet<>();
 
     public Item() {
     }
@@ -100,12 +96,32 @@ public class Item {
         bids.add(bid);
     }
 
+    public void deleteBid(Bid bid) {
+        bids.remove(bid);
+    }
+
+    public void deleteAllBids() {
+        bids.clear();
+    }
+
     public Set<Bid> getBids() {
         return Collections.unmodifiableSet(bids);
     }
 
     public void setBuyNowPrice(MonetaryAmount buyNowPrice) {
         this.buyNowPrice = buyNowPrice;
+    }
+
+    public void setDimensions(Dimensions dimensions) {
+        this.dimensions = dimensions;
+    }
+
+    public void setWeight(Weight weight) {
+        this.weight = weight;
+    }
+
+    public void addImage(Image image) {
+        images.add(image);
     }
 
     @Override

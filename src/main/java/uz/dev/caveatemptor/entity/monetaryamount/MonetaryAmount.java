@@ -1,6 +1,5 @@
 package uz.dev.caveatemptor.entity.monetaryamount;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -8,6 +7,7 @@ import java.util.Currency;
 import java.util.Objects;
 
 public class MonetaryAmount implements Serializable {
+
     @NotNull
     private final BigDecimal value;
 

@@ -15,9 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Currency;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
-
-import static java.util.Objects.requireNonNullElse;
 
 public class MonetaryAmountUserType implements CompositeUserType, DynamicParameterizedType {
 
@@ -26,9 +25,9 @@ public class MonetaryAmountUserType implements CompositeUserType, DynamicParamet
     @Override
     public void setParameterValues(Properties properties) {
         String convertToParameter = properties.getProperty("convertTo");
-        convertTo = Currency.getInstance(
-                requireNonNullElse(convertToParameter, "USD"));
-
+        convertTo = Optional.ofNullable(convertToParameter)
+                .map(Currency::getInstance)
+                .orElse(null);
     }
 
     @Override
@@ -112,9 +111,11 @@ public class MonetaryAmountUserType implements CompositeUserType, DynamicParamet
     public void nullSafeSet(PreparedStatement statement, Object value, int index, SharedSessionContractImplementor sharedSessionContractImplementor) throws HibernateException, SQLException {
         if (value != null) {
             MonetaryAmount amount = (MonetaryAmount) value;
-            MonetaryAmount dbAmount = convert(amount, convertTo);
-            statement.setBigDecimal(index, dbAmount.getValue());
-            statement.setString(index + 1, convertTo.getCurrencyCode());
+            if (convertTo != null) {
+                amount = convert(amount, convertTo);
+            }
+            statement.setBigDecimal(index, amount.getValue());
+            statement.setString(index + 1, amount.getCurrency().getCurrencyCode());
         } else {
             setNullStatement(statement, index);
         }

@@ -22,20 +22,30 @@ public class Main {
     public static void main(String[] args) {
         Session session = getSessionFactory().getCurrentSession();
         Transaction tx = session.beginTransaction();
-        Address shippingAddress = new Address("hmStreet", "hmCity", "hmCountry", "12345");
-        session.persist(shippingAddress);
-        User user = createNewUser(shippingAddress.getId());
-        user.setShippingAddress(shippingAddress);
+        User user = createNewUser();
+        Address shipping = new Address("hmStreet", "hmCity", "hmCountry", "12345");
+        user.setShippingAddress(shipping);
         session.persist(user);
+        Item item = createNewItem();
+        item.setBuyer(user);
+        session.persist(item);
         tx.commit();
 
-        System.out.println("====================================");
+        System.out.println("\n\n\n=================================\n\n");
+        session = getSessionFactory().getCurrentSession();
+        tx = session.beginTransaction();
+        Item newItem = session.load(Item.class, item.getId());
+        System.out.println(newItem.getBuyer());
+        tx.commit();
+
+        /*System.out.println("====================================");
         session = getSessionFactory().getCurrentSession();
         tx = session.beginTransaction();
         user = session.load(User.class, user.getId());
         System.out.println(user);
+        System.out.println(user.getDefaultBilling().getClass());
         tx.commit();
-        System.out.println("====================================");
+        System.out.println("====================================");*/
     }
 
     private static void addImages(Item item) {
@@ -57,8 +67,8 @@ public class Main {
         return item;
     }
 
-    private static User createNewUser(long id) {
-        User user = new User(id, "muzappar228", "Muzappar", "Muzapov");
+    private static User createNewUser() {
+        User user = new User("muzappar228", "Muzappar", "Muzapov");
         BillingDetails bd = new CreditCard("8600-1234-5678-9011", "12", "2028");
         user.setDefaultBilling(bd);
         return user;

@@ -14,12 +14,14 @@ public class Address {
 
     @NotNull
     private String street;
+
     @NotNull
     @AttributeOverride(name = "zipcode", column = @Column(name = "SHIPPING_ZIPCODE", nullable = false))
+    @AttributeOverride(name = "name", column = @Column(name = "CITY", nullable = false))
     @Convert(converter = ZipcodeConverter.class, attributeName = "zipcode")
     private City city;
 
-    public Address() {
+    protected Address() {
     }
 
     public Address(String street, String city, String country, String zipcode) {

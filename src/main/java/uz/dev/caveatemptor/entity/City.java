@@ -4,6 +4,7 @@ import lombok.Getter;
 import uz.dev.caveatemptor.entity.zipcode.Zipcode;
 import uz.dev.caveatemptor.entity.zipcode.ZipcodeFactory;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 
@@ -18,6 +19,7 @@ public class City {
     private String name;
 
     @NotNull
+    @Column(nullable = false)
     private String country;
 
     public City() {

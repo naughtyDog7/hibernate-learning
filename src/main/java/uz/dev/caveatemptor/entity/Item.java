@@ -70,6 +70,14 @@ public class Item {
     @CollectionTable(name = "IMAGE")
     private Set<Image> images = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "ITEM_BUYER",
+            joinColumns = @JoinColumn(name = "ITEM_ID"),
+            inverseJoinColumns = @JoinColumn(nullable = false)
+    )
+    private User buyer;
+
     public Item() {
     }
 
@@ -118,6 +126,15 @@ public class Item {
 
     public void setWeight(Weight weight) {
         this.weight = weight;
+    }
+
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
+        buyer.addBoughtItem(this);
+    }
+
+    public User getBuyer() {
+        return buyer;
     }
 
     public void addImage(Image image) {

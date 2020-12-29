@@ -26,9 +26,13 @@ public class Main {
         Address shipping = new Address("hmStreet", "hmCity", "hmCountry", "12345");
         user.setShippingAddress(shipping);
         session.persist(user);
+        Category category = createNewCategory();
         Item item = createNewItem();
         item.setBuyer(user);
         session.persist(item);
+        session.persist(category);
+        CategorizedItem categorizedItem = new CategorizedItem("muzappar", category, item);
+        session.persist(categorizedItem);
         tx.commit();
 
         System.out.println("\n\n\n=================================\n\n");
@@ -53,6 +57,10 @@ public class Main {
         item.addImage(new Image("Bar", "bar.jpg", 800, 600));
         item.addImage(new Image("Baz", "baz.jpg", 1024, 768));
         item.addImage(new Image("Baz", "baz.jpg", 1024, 768));
+    }
+
+    private static Category createNewCategory() {
+        return new Category("category1");
     }
 
     private static Item createNewItem() {

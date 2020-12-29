@@ -25,6 +25,8 @@ public class SessionFactoryConfigurer {
                     MetadataSources metadataSources = new MetadataSources(serviceRegistry)
                             .addPackage("uz.dev.caveatemptor.entity")
                             .addAnnotatedClass(Item.class)
+                            .addAnnotatedClass(Category.class)
+                            .addAnnotatedClass(CategorizedItem.class)
                             .addAnnotatedClass(User.class)
                             .addAnnotatedClass(Bid.class)
                             .addAnnotatedClass(Address.class)

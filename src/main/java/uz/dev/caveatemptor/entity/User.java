@@ -28,7 +28,6 @@ public class User {
 
     @OneToOne(
             fetch = FetchType.LAZY,
-            optional = false,
             cascade = CascadeType.PERSIST)
     @JoinColumn(unique = true)
     private Address shippingAddress;

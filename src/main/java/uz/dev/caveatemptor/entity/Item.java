@@ -46,7 +46,6 @@ public class Item {
     })
     private MonetaryAmount initialPrice;
 
-
     @Type(type = "monetary_amount_eur")
     @Columns(columns = {
             @Column(name = "BUY_NOW_PRICE_AMOUNT"),

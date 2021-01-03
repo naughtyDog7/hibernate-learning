@@ -1,13 +1,13 @@
 package uz.dev.caveatemptor.entity;
 
-import org.hibernate.annotations.Columns;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
 import uz.dev.caveatemptor.util.Constants;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.Table;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,6 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "item")
+@Check(constraints = "AUCTIONEND > AUCTIONSTART")
 public class Item {
     @Id
     @GeneratedValue(generator = Constants.ID_GENERATOR)
@@ -73,7 +74,9 @@ public class Item {
     @JoinTable(
             name = "ITEM_BUYER",
             joinColumns = @JoinColumn(name = "ITEM_ID"),
-            inverseJoinColumns = @JoinColumn(nullable = false)
+            inverseJoinColumns = @JoinColumn(nullable = false),
+            foreignKey = @ForeignKey(name = "FK_ITEM_ID"),
+            inverseForeignKey = @ForeignKey(name = "FK_BUYER_ID")
     )
     private User buyer;
 

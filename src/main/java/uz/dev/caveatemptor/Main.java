@@ -19,7 +19,7 @@ public class Main {
         Locale.setDefault(Locale.US);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Session session = getSessionFactory().getCurrentSession();
         Transaction tx = session.beginTransaction();
         User user = createNewUser();
@@ -28,28 +28,13 @@ public class Main {
         session.persist(user);
         Category category = createNewCategory();
         Item item = createNewItem();
+        addImages(item);
         item.setBuyer(user);
         session.persist(item);
         session.persist(category);
         CategorizedItem categorizedItem = new CategorizedItem("muzappar", category, item);
         session.persist(categorizedItem);
         tx.commit();
-
-        System.out.println("\n\n\n=================================\n\n");
-        session = getSessionFactory().getCurrentSession();
-        tx = session.beginTransaction();
-        Item newItem = session.load(Item.class, item.getId());
-        System.out.println(newItem.getBuyer());
-        tx.commit();
-
-        /*System.out.println("====================================");
-        session = getSessionFactory().getCurrentSession();
-        tx = session.beginTransaction();
-        user = session.load(User.class, user.getId());
-        System.out.println(user);
-        System.out.println(user.getDefaultBilling().getClass());
-        tx.commit();
-        System.out.println("====================================");*/
     }
 
     private static void addImages(Item item) {
@@ -76,7 +61,7 @@ public class Main {
     }
 
     private static User createNewUser() {
-        User user = new User("muzappar228", "Muzappar", "Muzapov");
+        User user = new User("muzappar228", "Muzappar", "Muzapov", "muzappar@gmail.com");
         BillingDetails bd = new CreditCard("8600-1234-5678-9011", "12", "2028");
         user.setDefaultBilling(bd);
         return user;

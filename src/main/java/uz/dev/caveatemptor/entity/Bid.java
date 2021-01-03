@@ -6,10 +6,7 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;

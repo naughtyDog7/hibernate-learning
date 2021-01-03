@@ -9,12 +9,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(generator = Constants.ID_GENERATOR)
     private long id;
 
     @NotNull
+    @Column(unique = true, columnDefinition = "username(15)")
     private String username;
 
     @NotNull
@@ -23,13 +25,17 @@ public class User {
     @NotNull
     private String lastName;
 
+    @NotNull
+    @Column(unique = true, columnDefinition = "emailAddress(255)")
+    private String email;
+
     @OneToMany(mappedBy = "buyer")
     private Set<Item> boughtItems = new HashSet<>();
 
     @OneToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.PERSIST)
-    @JoinColumn(unique = true)
+    @JoinColumn(unique = true, foreignKey = @ForeignKey(name = "FK_SHIPPING_ADDRESS_ID"))
     private Address shippingAddress;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -62,10 +68,11 @@ public class User {
         boughtItems.add(item);
     }
 
-    public User(String username, String firstName, String lastName) {
+    public User(String username, String firstName, String lastName, String email) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
     }
 
     @Override

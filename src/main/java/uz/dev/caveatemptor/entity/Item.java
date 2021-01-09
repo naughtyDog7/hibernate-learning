@@ -1,13 +1,14 @@
 package uz.dev.caveatemptor.entity;
 
 import org.hibernate.annotations.*;
+import uz.dev.caveatemptor.dao.listener.PersistEntityListener;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
 import uz.dev.caveatemptor.util.Constants;
 
-import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,11 +19,19 @@ import java.util.Set;
 
 @Entity
 @Table(name = "item")
+@EntityListeners(PersistEntityListener.class)
 @Check(constraints = "AUCTIONEND > AUCTIONSTART")
+//@Audited
+@Filter(name = Constants.Filters.LIMIT_BY_USER_RANK,
+        condition = ":" + Constants.QueryParams.CURRENT_USER_RANK +
+                " >= (SELECT u.RANK FROM Users u where u.ID = SELLER_ID)")
 public class Item {
     @Id
     @GeneratedValue(generator = Constants.ID_GENERATOR)
     private long id;
+
+    @Version
+    private long version;
 
     @Size(
             min = 2,
@@ -31,8 +40,6 @@ public class Item {
     )
     private String name;
     private String description;
-    @Formula("substr(description, 1, 12) || '...'")
-    private String shortDescription;
     @CreationTimestamp
     private LocalDateTime createdOn;
     private LocalDateTime auctionStart;
@@ -71,6 +78,11 @@ public class Item {
     private Set<Image> images = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SELLER_ID", foreignKey = @ForeignKey(name = "FK_SELLER_ID"))
+    @NotNull
+    private User seller;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinTable(
             name = "ITEM_BUYER",
             joinColumns = @JoinColumn(name = "ITEM_ID"),
@@ -83,23 +95,24 @@ public class Item {
     public Item() {
     }
 
-    public Item(String name, String description, MonetaryAmount initialPrice, AuctionType auctionType) {
+    public Item(String name, String description, MonetaryAmount initialPrice, AuctionType auctionType, User seller) {
         this.name = name;
         this.description = description;
         this.initialPrice = initialPrice;
         this.auctionType = auctionType;
+        this.seller = seller;
     }
 
     public long getId() {
         return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
-    public String getShortDescription() {
-        return shortDescription;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void addBid(Bid bid) {

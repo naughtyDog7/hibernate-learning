@@ -18,11 +18,29 @@
                 typeClass = MonetaryAmountUserType.class,
                 parameters = @Parameter(name = "convertTo", value = "EUR")),
 })
+@FetchProfiles({
+        @FetchProfile(
+                name = "FETCH_BIDS_JOIN",
+                fetchOverrides = @FetchProfile.FetchOverride(
+                        entity = Item.class,
+                        association = "bids",
+                        mode = FetchMode.JOIN
+                )
+        )
+})
+@FilterDef(
+        name = Constants.Filters.LIMIT_BY_USER_RANK,
+        parameters = @ParamDef(
+                name = Constants.QueryParams.CURRENT_USER_RANK, type = "int"
+        )
+)
+@NamedQueries({
+        @NamedQuery(
+                name = Constants.QueryNames.SELECT_ITEM_BY_LIKE_NAME,
+                query = "SELECT i FROM Item i WHERE i.name LIKE :name")
+})
 package uz.dev.caveatemptor.entity;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
+import org.hibernate.annotations.*;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmountUserType;
 import uz.dev.caveatemptor.util.Constants;

@@ -1,22 +1,32 @@
 package uz.dev.caveatemptor.entity;
 
+import org.hibernate.envers.NotAudited;
 import uz.dev.caveatemptor.entity.billingdetails.BillingDetails;
 import uz.dev.caveatemptor.util.Constants;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_USERNAME", columnNames = "USERNAME"),
+                @UniqueConstraint(name = "UK_EMAIL", columnNames = "EMAIL"),
+                @UniqueConstraint(name = "UK_SHIPPING_ADDRESS_ID", columnNames = "SHIPPINGADDRESS_ID")
+        }
+)
+//@Audited
 public class User {
+
     @Id
     @GeneratedValue(generator = Constants.ID_GENERATOR)
     private long id;
 
     @NotNull
-    @Column(unique = true, columnDefinition = "username(15)")
+    @Column(columnDefinition = "username(15)")
     private String username;
 
     @NotNull
@@ -26,22 +36,34 @@ public class User {
     private String lastName;
 
     @NotNull
-    @Column(unique = true, columnDefinition = "emailAddress(255)")
+    @Column(columnDefinition = "emailAddress(255)")
     private String email;
 
     @OneToMany(mappedBy = "buyer")
     private Set<Item> boughtItems = new HashSet<>();
 
+    private int rank;
+
     @OneToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.PERSIST)
-    @JoinColumn(unique = true, foreignKey = @ForeignKey(name = "FK_SHIPPING_ADDRESS_ID"))
+    @JoinColumn(foreignKey = @ForeignKey(name = "FK_SHIPPING_ADDRESS_ID"))
+    @NotAudited
     private Address shippingAddress;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(foreignKey = @ForeignKey(name = "FK_DEFAULT_BILLING_ID"))
+    @NotAudited
     private BillingDetails defaultBilling;
 
     public User() {
+    }
+
+    public User(String username, String firstName, String lastName, String email) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
     }
 
     public void setDefaultBilling(BillingDetails defaultBilling) {
@@ -68,11 +90,29 @@ public class User {
         boughtItems.add(item);
     }
 
-    public User(String username, String firstName, String lastName, String email) {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
         this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return getUsername().equals(user.getUsername());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUsername());
     }
 
     @Override

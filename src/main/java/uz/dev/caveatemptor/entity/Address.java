@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 public class Address {
+
     @Id
     @GeneratedValue(generator = Constants.ID_GENERATOR)
     private long id;

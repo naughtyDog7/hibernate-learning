@@ -6,6 +6,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
 import uz.dev.caveatemptor.entity.*;
+import uz.dev.caveatemptor.entity.audit.AuditLogRecord;
 import uz.dev.caveatemptor.entity.billingdetails.BankAccount;
 import uz.dev.caveatemptor.entity.billingdetails.BillingDetails;
 import uz.dev.caveatemptor.entity.billingdetails.CreditCard;
@@ -34,7 +35,8 @@ public class SessionFactoryConfigurer {
                             .addAnnotatedClass(ZipcodeConverter.class)
                             .addAnnotatedClass(BillingDetails.class)
                             .addAnnotatedClass(BankAccount.class)
-                            .addAnnotatedClass(CreditCard.class);
+                            .addAnnotatedClass(CreditCard.class)
+                            .addAnnotatedClass(AuditLogRecord.class);
                     Metadata metadata = metadataSources.buildMetadata();
                     sessionFactory = metadata.buildSessionFactory();
                 }

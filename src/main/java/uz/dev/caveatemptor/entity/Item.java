@@ -13,7 +13,6 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -66,10 +65,6 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private AuctionType auctionType;
 
-    @ElementCollection
-    @CollectionTable(name = "BID")
-    private Set<Bid> bids = new HashSet<>();
-
     private Dimensions dimensions;
     private Weight weight;
 
@@ -115,22 +110,6 @@ public class Item {
         this.name = name;
     }
 
-    public void addBid(Bid bid) {
-        bids.add(bid);
-    }
-
-    public void deleteBid(Bid bid) {
-        bids.remove(bid);
-    }
-
-    public void deleteAllBids() {
-        bids.clear();
-    }
-
-    public Set<Bid> getBids() {
-        return Collections.unmodifiableSet(bids);
-    }
-
     public void setBuyNowPrice(MonetaryAmount buyNowPrice) {
         this.buyNowPrice = buyNowPrice;
     }
@@ -158,16 +137,6 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Item{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", createdOn=" + createdOn +
-                ", auctionStart=" + auctionStart +
-                ", auctionEnd=" + auctionEnd +
-                ", verified=" + verified +
-                ", initialPrice=" + initialPrice +
-                ", auctionType=" + auctionType +
-                '}';
+        return "Item '" + getName();
     }
 }

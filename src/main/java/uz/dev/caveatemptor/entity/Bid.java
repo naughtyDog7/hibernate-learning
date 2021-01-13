@@ -1,22 +1,23 @@
 package uz.dev.caveatemptor.entity;
 
-import org.hibernate.annotations.Columns;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Type;
-import uz.dev.caveatemptor.entity.audit.Auditable;
+import org.hibernate.annotations.*;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
+import uz.dev.caveatemptor.util.Constants;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Embeddable
+@Entity
 @Immutable
 public class Bid implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = Constants.ID_GENERATOR)
+    private long id;
 
     @Type(type = "monetary_amount")
     @Columns(columns = {
@@ -28,12 +29,18 @@ public class Bid implements Serializable {
     private LocalDateTime createdOn;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(foreignKey = @ForeignKey(name = "FK_ITEM_ID"))
+    private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(foreignKey = @ForeignKey(name = "FK_BIDDER_ID"))
     private User bidder;
 
     protected Bid() {
     }
 
-    public Bid(MonetaryAmount amount, User bidder) {
+    public Bid(Item item, MonetaryAmount amount, User bidder) {
+        this.item = item;
         this.amount = amount;
         this.bidder = bidder;
         this.createdOn = LocalDateTime.now();
@@ -58,5 +65,10 @@ public class Bid implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getAmount(), getBidder().getId());
+    }
+
+    @Override
+    public String toString() {
+        return "Bid made by user with id " + getBidder().getId() + " with amount: " + getAmount();
     }
 }

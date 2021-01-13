@@ -10,8 +10,8 @@ import uz.dev.caveatemptor.entity.audit.AuditLogInterceptor;
 import uz.dev.caveatemptor.entity.billingdetails.BillingDetails;
 import uz.dev.caveatemptor.entity.billingdetails.CreditCard;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
-import uz.dev.caveatemptor.util.Constants;
 
+import javax.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
@@ -37,14 +37,14 @@ class MainTest {
         seller = createNewUser();
         seller.setRank(1);
         session.persist(seller);
-        item = createNewItem(seller);
-        session.persist(item);
         User bidder1 = createNewUser();
         User bidder2 = createNewUser();
         session.persist(bidder1);
         session.persist(bidder2);
-        item.addBid(new Bid(MonetaryAmount.fromString("1.4e6 USD"), bidder1));
-        item.addBid(new Bid(MonetaryAmount.fromString("1.6e6 USD"), bidder2));
+        item = createNewItem(seller);
+        session.persist(item);
+        session.persist(new Bid(item, MonetaryAmount.fromString("1.6e6 USD"), bidder1));
+        session.persist(new Bid(item, MonetaryAmount.fromString("1.4e6 USD"), bidder2));
         tx.commit();
     }
 
@@ -52,9 +52,16 @@ class MainTest {
     void main() {
         Session session = getSessionFactory().getCurrentSession();
         Transaction tx = session.beginTransaction();
-        System.out.println(session.createNamedQuery(Constants.QueryNames.SELECT_ITEM_BY_LIKE_NAME)
-                .setParameter("name", "G%")
-                .getResultList());
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<User> criteria = cb.createQuery(User.class);
+        Root<User> u = criteria.from(User.class);
+        Subquery<Item> sq = criteria.subquery(Item.class);
+        Root<Item> i = sq.from(Item.class);
+        sq.select(i).where(cb.equal(i.get("seller"), u));
+        criteria.select(u).where(cb.not(cb.exists(sq)));
+        System.out.println(
+                session.createQuery(criteria)
+                .list());
         tx.commit();
     }
 

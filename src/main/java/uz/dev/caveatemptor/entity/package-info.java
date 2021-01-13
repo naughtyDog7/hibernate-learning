@@ -18,16 +18,6 @@
                 typeClass = MonetaryAmountUserType.class,
                 parameters = @Parameter(name = "convertTo", value = "EUR")),
 })
-@FetchProfiles({
-        @FetchProfile(
-                name = "FETCH_BIDS_JOIN",
-                fetchOverrides = @FetchProfile.FetchOverride(
-                        entity = Item.class,
-                        association = "bids",
-                        mode = FetchMode.JOIN
-                )
-        )
-})
 @FilterDef(
         name = Constants.Filters.LIMIT_BY_USER_RANK,
         parameters = @ParamDef(

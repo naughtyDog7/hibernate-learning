@@ -1,10 +1,11 @@
 package uz.dev.caveatemptor.entity;
 
 import org.hibernate.annotations.*;
-import uz.dev.caveatemptor.dao.listener.PersistEntityListener;
+import org.hibernate.annotations.Cache;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
 import uz.dev.caveatemptor.util.Constants;
 
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.Table;
@@ -18,15 +19,19 @@ import java.util.Set;
 
 @Entity
 @Table(name = "item")
-@EntityListeners(PersistEntityListener.class)
-@Check(constraints = "AUCTIONEND > AUCTIONSTART")
+//@EntityListeners(PersistEntityListener.class)
+@Check(constraints = "auction_end > auction_start")
 //@Audited
 @Filter(name = Constants.Filters.LIMIT_BY_USER_RANK,
         condition = ":" + Constants.QueryParams.CURRENT_USER_RANK +
                 " >= (SELECT u.RANK FROM Users u where u.ID = SELLER_ID)")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+
 public class Item {
     @Id
     @GeneratedValue(generator = Constants.ID_GENERATOR)
+    @Access(AccessType.PROPERTY)
     private long id;
 
     @Version
@@ -102,6 +107,10 @@ public class Item {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -137,6 +146,6 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Item '" + getName();
+        return "Item '" + getId() + "'";
     }
 }

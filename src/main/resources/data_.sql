@@ -1,0 +1,41 @@
+SELECT * FROM IMAGE;
+--
+-- insert
+-- into billing_details
+--     (card_number, exp_month, exp_year, bd_type, id)
+--
+-- values ('8600-1234-5678-9011', '12', '2028', 'CC', IDS_SEQUENCE.nextval),
+--        ('8600-1234-5678-9012', '12', '2028', 'CC', IDS_SEQUENCE.nextval),
+--        ('8600-1234-5678-9013', '12', '2028', 'CC', IDS_SEQUENCE.nextval);
+--
+-- insert
+-- into users
+-- (default_billing_id, email, first_name, last_name, rank, shipping_address_id, username, id)
+-- values (1000, 'muzappar22@gmail.com', 'muzappar', 'muzapov', 0, null, 'muzappar22', IDS_SEQUENCE.nextval),
+--        (1002, 'muzappar23@gmail.com', 'muzappar', 'muzapov', 0, null, 'muzappar23', IDS_SEQUENCE.nextval),
+--        (1004, 'muzappar24@gmail.com', 'muzappar', 'muzapov', 0, null, 'muzappar24', IDS_SEQUENCE.nextval);
+--
+-- INSERT
+-- into item
+-- (auction_end, auction_start, auction_type, buy_now_price_amount, buy_now_price_currency, created_on, description, depth,
+--  height, width, dimensions_name, dimensions_symbol, initial_price_amount, initial_price_currency, name, seller_id,
+--  verified, version, weight, weight_name, weight_symbol, id)
+-- values (PARSEDATETIME('11-12-22', 'dd-MM-yy'), PARSEDATETIME('10-12-22', 'dd-MM-yy'), 'HIGHEST_BID', 1000000, 'USD',
+--         CURRENT_TIMESTAMP(), 'The most high priced egg in the world', 10, 14, 10, 'dimensions', 'cm', 600000,
+--         'USD', 'Golden egg', 1006, true, 0, 2, 'weight', 'kg', IDS_SEQUENCE.nextval);
+--
+-- INSERT INTO IMAGE
+--     (ITEM_ID, TITLE, FILENAME, HEIGHT, WIDTH)
+-- VALUES (1012, 'Foo', 'foo.jpg', 640, 480),
+--        (1012, 'Bar', 'bar.jpg', 800, 600),
+--        (1012, 'Baz', 'baz.jpg', 1024, 768);
+--
+-- insert
+-- into bid
+--     (amount, currency, bidder_id, created_on, item_id, id)
+-- values (1600000, 'USD', 1008, CURRENT_TIMESTAMP(), 1012, IDS_SEQUENCE.nextval);
+--
+-- insert
+-- into bid
+--     (amount, currency, bidder_id, created_on, item_id, id)
+-- values ('1400000', 'USD', 1010, CURRENT_TIMESTAMP(), 1012, IDS_SEQUENCE.nextval);

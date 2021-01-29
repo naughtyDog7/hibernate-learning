@@ -2,7 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/java/uz/dev/caveatemptor/entity/ItemBidSummary.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/complexSchemas/CreateScript.sql" dialect="H2" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/complexSchemas/CreateScript.sql" dialect="MySQL" />
     <file url="PROJECT" dialect="H2" />
   </component>
 </project>

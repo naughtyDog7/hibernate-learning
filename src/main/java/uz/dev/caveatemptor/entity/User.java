@@ -1,5 +1,9 @@
 package uz.dev.caveatemptor.entity;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 import org.hibernate.envers.NotAudited;
 import uz.dev.caveatemptor.entity.billingdetails.BillingDetails;
 import uz.dev.caveatemptor.util.Constants;
@@ -11,13 +15,10 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "UK_USERNAME", columnNames = "USERNAME"),
-                @UniqueConstraint(name = "UK_EMAIL", columnNames = "EMAIL"),
-                @UniqueConstraint(name = "UK_SHIPPING_ADDRESS_ID", columnNames = "SHIPPINGADDRESS_ID")
-        }
-)
+@Table(name = "users")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@NaturalIdCache
 //@Audited
 public class User {
 
@@ -26,7 +27,8 @@ public class User {
     private long id;
 
     @NotNull
-    @Column(columnDefinition = "username(15)")
+    @NaturalId
+    @Column(updatable = false)
     private String username;
 
     @NotNull
@@ -36,12 +38,12 @@ public class User {
     private String lastName;
 
     @NotNull
-    @Column(columnDefinition = "emailAddress(255)")
     private String email;
 
     @OneToMany(mappedBy = "buyer")
     private Set<Item> boughtItems = new HashSet<>();
 
+    @Column(name = "userRank")
     private int rank;
 
     @OneToOne(
@@ -121,6 +123,8 @@ public class User {
                 "username='" + username + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", rank=" + rank +
                 '}';
     }
 }

@@ -1,4 +1,4 @@
-package uz.dev.caveatemptor.dao.listener;
+package uz.dev.caveatemptor.repository.listener;
 
 import javax.persistence.PostPersist;
 

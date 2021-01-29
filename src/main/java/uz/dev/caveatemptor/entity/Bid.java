@@ -1,18 +1,22 @@
 package uz.dev.caveatemptor.entity;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.Type;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
 import uz.dev.caveatemptor.util.Constants;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Immutable
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class Bid implements Serializable {
 
     @Id
@@ -46,12 +50,20 @@ public class Bid implements Serializable {
         this.createdOn = LocalDateTime.now();
     }
 
+    public long getId() {
+        return id;
+    }
+
     public MonetaryAmount getAmount() {
         return amount;
     }
 
     public User getBidder() {
         return bidder;
+    }
+
+    public Item getItem() {
+        return item;
     }
 
     @Override

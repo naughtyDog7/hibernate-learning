@@ -13,7 +13,7 @@ import java.util.Objects;
 public class CategorizedItem {
 
     @Embeddable
-    private static class Id implements Serializable {
+    static class Id implements Serializable {
         @Column(name = "CATEGORY_ID")
         private long categoryId;
         @Column(name = "ITEM_ID")

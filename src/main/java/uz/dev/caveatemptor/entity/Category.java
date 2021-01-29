@@ -2,9 +2,9 @@ package uz.dev.caveatemptor.entity;
 
 import uz.dev.caveatemptor.util.Constants;
 
-import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @Entity
 public class Category {
@@ -23,5 +23,13 @@ public class Category {
 
     public long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

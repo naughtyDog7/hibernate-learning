@@ -2,8 +2,9 @@
         strategy = "enhanced-sequence",
         parameters = {
                 @Parameter(name = "sequence_name", value = "IDS_SEQUENCE"),
-                @Parameter(name = "initial_value", value = "1000"),
-                @Parameter(name = "increment_size", value = "2")
+                @Parameter(name = "initial_value", value = "1"),
+                @Parameter(name = "increment_size", value = "100"),
+                @Parameter(name = "optimizer", value = "pooled-lo")
         })
 @TypeDefs({
         @TypeDef(

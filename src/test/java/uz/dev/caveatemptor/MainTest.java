@@ -1,27 +1,64 @@
 package uz.dev.caveatemptor;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.test.annotation.Commit;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.ReflectionUtils;
 import uz.dev.caveatemptor.entity.*;
-import uz.dev.caveatemptor.entity.audit.AuditLogInterceptor;
 import uz.dev.caveatemptor.entity.billingdetails.BillingDetails;
 import uz.dev.caveatemptor.entity.billingdetails.CreditCard;
 import uz.dev.caveatemptor.entity.monetaryamount.MonetaryAmount;
+import uz.dev.caveatemptor.repository.BidRepository;
+import uz.dev.caveatemptor.repository.ItemRepository;
+import uz.dev.caveatemptor.repository.UserRepository;
 
-import javax.persistence.criteria.*;
+import javax.persistence.EntityManager;
+import javax.sql.DataSource;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
-import static uz.dev.caveatemptor.dao.SessionFactoryConfigurer.getSessionFactory;
 
+@ExtendWith(SpringExtension.class)
+@DataJpaTest(includeFilters = @ComponentScan.Filter(classes = Repository.class), showSql = true)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles({"h2", "cache"})
+//@Import(MainTest.DatasourceProxyBeanPostProcessor.class)
 class MainTest {
+
 
     Item item;
     User seller;
+
+    @Autowired
+    private TestEntityManager testEntityManager;
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @Autowired
+    private BidRepository bidRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private static long userId = 230;
 
@@ -32,54 +69,30 @@ class MainTest {
 
     @BeforeEach
     void saveItem() {
-        Session session = getSessionFactory().getCurrentSession();
-        Transaction tx = session.beginTransaction();
         seller = createNewUser();
         seller.setRank(1);
-        session.persist(seller);
+        userRepository.save(seller);
         User bidder1 = createNewUser();
         User bidder2 = createNewUser();
-        session.persist(bidder1);
-        session.persist(bidder2);
+        userRepository.save(bidder1);
+        userRepository.save(bidder2);
         item = createNewItem(seller);
-        session.persist(item);
-        session.persist(new Bid(item, MonetaryAmount.fromString("1.6e6 USD"), bidder1));
-        session.persist(new Bid(item, MonetaryAmount.fromString("1.4e6 USD"), bidder2));
-        tx.commit();
+        itemRepository.makePersistent(item);
+        bidRepository.makePersistent(new Bid(item, MonetaryAmount.fromString("1.6e6 USD"), bidder1));
+        bidRepository.makePersistent(new Bid(item, MonetaryAmount.fromString("1.4e6 USD"), bidder2));
+        EntityManager em = testEntityManager.getEntityManager();
+        em.flush();
     }
 
     @Test
+    @Commit
     void main() {
-        Session session = getSessionFactory().getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<User> criteria = cb.createQuery(User.class);
-        Root<User> u = criteria.from(User.class);
-        Subquery<Item> sq = criteria.subquery(Item.class);
-        Root<Item> i = sq.from(Item.class);
-        sq.select(i).where(cb.equal(i.get("seller"), u));
-        criteria.select(u).where(cb.not(cb.exists(sq)));
-        System.out.println(
-                session.createQuery(criteria)
-                .list());
-        tx.commit();
-    }
-
-    private Session getSessionWithInterceptor() {
-        AuditLogInterceptor interceptor = new AuditLogInterceptor();
-        Session session = getSessionFactory()
-                .withOptions()
-                .interceptor(interceptor)
-                .openSession();
-        interceptor.setCurrentSession(session);
-        interceptor.setCurrentUserId(12301);
-        return session;
+        
     }
 
     private void addImages(Item item) {
         item.addImage(new Image("Foo", "foo.jpg", 640, 480));
         item.addImage(new Image("Bar", "bar.jpg", 800, 600));
-        item.addImage(new Image("Baz", "baz.jpg", 1024, 768));
         item.addImage(new Image("Baz", "baz.jpg", 1024, 768));
     }
 
@@ -106,4 +119,46 @@ class MainTest {
         return user;
     }
 
+    @Component
+    public static class DatasourceProxyBeanPostProcessor implements BeanPostProcessor {
+
+        @Override
+        public Object postProcessBeforeInitialization(final Object bean, final String beanName) throws BeansException {
+            return bean;
+        }
+
+        @Override
+        public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
+            if (bean instanceof DataSource) {
+                ProxyFactory factory = new ProxyFactory(bean);
+                factory.setProxyTargetClass(true);
+                factory.addAdvice(new ProxyDataSourceInterceptor((DataSource) bean));
+                return factory.getProxy();
+            }
+            return bean;
+        }
+    }
+
+    private static class ProxyDataSourceInterceptor implements MethodInterceptor {
+        private final DataSource dataSource;
+
+        public ProxyDataSourceInterceptor(DataSource dataSource) {
+            this.dataSource = ProxyDataSourceBuilder.create(dataSource)
+                    .name("DataSourceLogger")
+                    .asJson()
+                    .countQuery()
+                    .logQueryToSysOut()
+                    .build();
+        }
+
+        @Override
+        public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+            Method proxyMethod = ReflectionUtils.findMethod(dataSource.getClass(),
+                    methodInvocation.getMethod().getName());
+            if (proxyMethod != null) {
+                return proxyMethod.invoke(dataSource, methodInvocation.getArguments());
+            }
+            return methodInvocation.proceed();
+        }
+    }
 }

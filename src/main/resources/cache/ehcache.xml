@@ -1,0 +1,24 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+    <cache name="uz.dev.caveatemptor.entity.User"
+           maxElementsInMemory="500"
+           timeToIdleSeconds="30"
+           timeToLiveSeconds="60"
+           statistics="true"/>
+
+    <cache name="uz.dev.caveatemptor.entity.User##NaturalId"
+           maxElementsInMemory="500"
+           timeToIdleSeconds="30"
+           timeToLiveSeconds="60"/>
+
+    <cache name="uz.dev.caveatemptor.entity.Item"
+           maxElementsInMemory="5000"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600"/>
+
+    <cache name="uz.dev.caveatemptor.entity.Bid"
+           maxElementsInMemory="100000"
+           eternal="false"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600"/>
+</ehcache>

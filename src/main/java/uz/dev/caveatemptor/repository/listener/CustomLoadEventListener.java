@@ -1,4 +1,4 @@
-package uz.dev.caveatemptor.dao.listener;
+package uz.dev.caveatemptor.repository.listener;
 
 import org.hibernate.HibernateException;
 import org.hibernate.event.internal.DefaultLoadEventListener;
